@@ -1,4 +1,4 @@
-//This will actually load up the object being tested/the program
+package testers;//This will actually load up the object being tested/the program
 
 
 public class ObjectTester {
@@ -9,6 +9,6 @@ public class ObjectTester {
     }
     //Start the instance
     public Object startInstance(){
-
+        return new Object(); //Do nothing for now
     }
 }
