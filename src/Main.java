@@ -1,6 +1,7 @@
 import utils.ProgramCompiler;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 //This is a example of how the java tester would work
@@ -9,6 +10,7 @@ public class Main {
     public static void main(String[] args) {
 
         ProgramCompiler compiler = new ProgramCompiler();
-        List<String> directories = compiler.compile(Arrays.asList(CWD+"/TestPrograms/Person.java"));
+        HashMap<?,?> directories = compiler.compileWithNames(Arrays.asList(CWD+"/TestPrograms/Person.java"));
+        System.out.println(directories);
     }
 }
