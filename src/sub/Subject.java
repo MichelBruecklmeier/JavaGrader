@@ -1,3 +1,5 @@
+package sub;
+
 //The point of the subject class is to make a wrapper for each 'student' or
 //participant that is getting they're program tested, it allows us to store information
 //like the name of the person getting tested and there grade.
@@ -12,7 +14,7 @@ public class Subject {
     private static double MAX_POINTS;
     //Shared ID
     private static int SHARED_ID;
-    //Program object
+    //sub.Program object
     private Object instance;
 
     public Subject(String name, String directory){

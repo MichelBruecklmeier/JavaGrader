@@ -1,5 +1,7 @@
 package utils;//The program will compile the programs into a .class file to be used
 
+import sub.Program;
+
 import javax.tools.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +14,27 @@ public class ProgramCompiler {
     public ProgramCompiler()  {
 
     }
+    //IMPORTANT: this will compile the programs attach listeners and store valuable
+    //info in the program object to be used then
+    public List<Program> compileToProgramObj(List<String> sourceFilePaths){
+        //Final list of program objects
+        List<Program> programs = new ArrayList<>();
+        //Get the java compiler
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if(compiler == null)
+            throw new IllegalStateException("Failed to get java compiler");
+
+        //Try to get file manager
+        try(StandardJavaFileManager fileManager = compiler.getStandardFileManager(null,null,null)){
+
+        } catch(IOException e){
+            //WOW such amazing programing here
+            throw new IllegalStateException(e.getMessage());
+        }
+        return programs;
+    }
+
+    //TODO: reevaluate the importance of all this code below (probably delete)
     //This will compile .java files to .class files
     //NOTE: Will only compile to .class file wont return the instance
     public List<String> compile(List<String> sourceFilePaths,List<String> dirName){
