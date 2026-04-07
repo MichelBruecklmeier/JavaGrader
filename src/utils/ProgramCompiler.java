@@ -16,7 +16,10 @@ public class ProgramCompiler {
     }
     //IMPORTANT: this will compile the programs attach listeners and store valuable
     //info in the program object to be used then
-    public List<Program> compileToProgramObj(List<String> sourceFilePaths){
+    //REQUIRED PARAMS: you need a hashmap that links programmer names to the program destination
+    //for example if Michel -> {Programs/Human.java , Programs/SuperHuman.java}
+    //TODO: figure out how to make a complex java folder with multiple classes compile with the right args
+    public List<Program> compileToProgram(HashMap<String,List<String>> linkedSourcePaths){
         //Final list of program objects
         List<Program> programs = new ArrayList<>();
         //Get the java compiler
@@ -26,7 +29,38 @@ public class ProgramCompiler {
 
         //Try to get file manager
         try(StandardJavaFileManager fileManager = compiler.getStandardFileManager(null,null,null)){
+            //Indexing for the names
+            for(int nameIndex = 0; nameIndex < linkedSourcePaths.keySet().size(); nameIndex++){
+                String name = (String) linkedSourcePaths.keySet().toArray()[nameIndex];
+                List<String> sourcePaths = linkedSourcePaths.get(name);
+                //Make the Prgoram object
+                Program currentProgram = new Program(name,sourcePaths,CWD);
+                for(String path:sourcePaths){
+                    File file = new File(path);
+                    //File object that compiler can use
+                    Iterable<? extends JavaFileObject> compilationUnits =
+                            fileManager.getJavaFileObjectsFromFiles(List.of(file));
+                    //Where file gets compiled too
+                    String dirFlags = "Programs/"+name+"/";
+                    //Check if we have a dir for that name already if not make one
+                    if(!makeProgramsDir(name))
+                        throw new IllegalStateException("Failed to create directory for name "+name);
+                    Iterable<String> compilerOptions = Arrays.asList("-d",dirFlags);
+                    //Call to the compiler
+                    JavaCompiler.CompilationTask task = compiler.getTask(
+                            currentProgram.getOutputListener(),
+                            fileManager,
+                            currentProgram.getDiagnosticListener(),
+                            compilerOptions,
+                            null,
+                            compilationUnits
+                    );
 
+
+
+
+                }
+            }
         } catch(IOException e){
             //WOW such amazing programing here
             throw new IllegalStateException(e.getMessage());
