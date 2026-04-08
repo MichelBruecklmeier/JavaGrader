@@ -39,15 +39,27 @@ public class Program {
     public Program(String programmerName, List<String> sourcePaths, String cwd){
         this(programmerName,sourcePaths,cwd,new DiagnosticListener(), new OutputListener());
     }
+    public void load(){
+
+    }
     //Start instance with specific constructor
     public boolean invoke(){
 
         return false;
+    }
+    public void setFatalError(boolean on_off){
+        fatalError = on_off;
     }
     public DiagnosticListener getDiagnosticListener(){
         return diagnostic;
     }
     public OutputListener getOutputListener(){
         return output;
+    }
+    public String getName(){
+        return programmerName;
+    }
+    public String toString(){
+        return programmerName + " " + sourcePaths;
     }
 }

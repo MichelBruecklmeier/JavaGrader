@@ -1,6 +1,7 @@
 package utils;//The program will compile the programs into a .class file to be used
 
 import sub.Program;
+import sub.Subject;
 
 import javax.tools.*;
 import java.io.File;
@@ -32,40 +33,56 @@ public class ProgramCompiler {
             //Indexing for the names
             for(int nameIndex = 0; nameIndex < linkedSourcePaths.keySet().size(); nameIndex++){
                 String name = (String) linkedSourcePaths.keySet().toArray()[nameIndex];
-                List<String> sourcePaths = linkedSourcePaths.get(name);
-                //Make the Prgoram object
-                Program currentProgram = new Program(name,sourcePaths,CWD);
-                for(String path:sourcePaths){
-                    File file = new File(path);
-                    //File object that compiler can use
-                    Iterable<? extends JavaFileObject> compilationUnits =
-                            fileManager.getJavaFileObjectsFromFiles(List.of(file));
-                    //Where file gets compiled too
-                    String dirFlags = "Programs/"+name+"/";
-                    //Check if we have a dir for that name already if not make one
-                    if(!makeProgramsDir(name))
-                        throw new IllegalStateException("Failed to create directory for name "+name);
-                    Iterable<String> compilerOptions = Arrays.asList("-d",dirFlags);
-                    //Call to the compiler
-                    JavaCompiler.CompilationTask task = compiler.getTask(
-                            currentProgram.getOutputListener(),
-                            fileManager,
-                            currentProgram.getDiagnosticListener(),
-                            compilerOptions,
-                            null,
-                            compilationUnits
-                    );
-
-
-
-
+                if(name == null){
+                    throw new IllegalStateException("Name cannot be null");
                 }
+                //Where file gets compiled too
+                String dirFlags = "Programs"+File.separator + name + File.separator;
+                //Convert dirs to file list
+                List<File> sourceFiles = new ArrayList<>();
+                //Where programs are compiled too used later
+                List<String> compiledPaths = new ArrayList<>();
+                for(String source: linkedSourcePaths.get(name)) {
+                    sourceFiles.add(new File(source));
+                    String[] splitDir = source.split("\\\\");//TODO: unhardocde the windows file sperator
+                    compiledPaths.add(CWD+File.separator+dirFlags+splitDir[splitDir.length-1].split("\\.")[0]+".class"); //This does something
+                }
+                //File object that compiler can use
+                Iterable<? extends JavaFileObject> compilationUnits =
+                        fileManager.getJavaFileObjectsFromFiles(sourceFiles);
+
+                //Check if we have a dir for that name already if not make one
+                if (!makeProgramsDir(name))
+                    throw new IllegalStateException("Failed to create directory for name " + name);
+                Iterable<String> compilerOptions = Arrays.asList("-d", dirFlags);
+
+                //Add new program object
+                Program currentProgram = new Program(name,compiledPaths,CWD);
+                //Call to the compiler
+                JavaCompiler.CompilationTask task = compiler.getTask(
+                        currentProgram.getOutputListener(),
+                        fileManager,
+                        currentProgram.getDiagnosticListener(),
+                        compilerOptions,
+                        null,//TODO: make this work DUH
+                        compilationUnits
+                );
+                currentProgram.setFatalError(task.call()); //If task.call fails then the program failed to compile
+                programs.add(currentProgram);
             }
         } catch(IOException e){
             //WOW such amazing programing here
             throw new IllegalStateException(e.getMessage());
         }
         return programs;
+    }
+    //Compile to the subject wrapper class
+    public List<Subject> compileToSubject(HashMap<String, List<String>> linkedSourcePaths){
+        List<Subject> subjects = new ArrayList<>();
+        List<Program> compiledPrograms = compileToProgram(linkedSourcePaths);
+        for(Program program: compiledPrograms)
+            subjects.add(new Subject(program));
+        return subjects;
     }
 
     //TODO: reevaluate the importance of all this code below (probably delete)
